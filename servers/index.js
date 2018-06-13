@@ -53,7 +53,8 @@ http.createServer((req, res) => {
                         }
                         const user = {
                             ...data,
-                            ...wxData
+                            ...wxData,
+                            addTime: new Date(),
                         };
                         connectMogo('user', 'insertOne', user).then(z => {
                             z.db.close();
@@ -81,7 +82,11 @@ http.createServer((req, res) => {
         res.end(JSON.stringify({ status: 0, msg: "请登录！", data: [] }));
     } else {
         MongoClient.connect(moggoUrl, function (err, db) {
-            if (err) rej(err);
+            if (err) {
+                res.writeHead(200, { 'Content-Type': 'text/plain;charset=utf-8' });
+                res.end(JSON.stringify({ status: 0, msg: "服务器异常！", data: "" }));
+                return
+            };
             var dbase = db.db("haiying");
             dbase.collection('user').findOne({ session_key: data.session_key }, (err, arr) => {
                 if (err || !arr) {

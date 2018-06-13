@@ -21,7 +21,7 @@ exports.route = (req, res, userInfo) => {
             data = JSON.parse(data);
         })
     }
-
+    delete data.session_key;
     switch (path) {
         case '/':
             console.log('我是默认页面');
@@ -35,7 +35,7 @@ exports.route = (req, res, userInfo) => {
                     res.end(JSON.stringify({ status: 0, msg: "数据已存在！", data: "" }));
                     return
                 }
-                connectMogo('type', 'insertOne', data).then(z => {
+                connectMogo('type', 'insertOne', { ...data, addTime: new Date() }).then(z => {
                     x.db.close();
                     res.writeHead(200, { 'Content-Type': 'text/plain;charset=utf-8' });
                     res.end(JSON.stringify({ status: 1, msg: "添加成功！", data: data }));
@@ -49,8 +49,10 @@ exports.route = (req, res, userInfo) => {
             break;
         case '/api/type/list':
             // 返回所有的分类列表
-            let arr = [];
-            connectMogo('type', 'find').then(x => {
+            let typeName = {
+                name: new RegExp(data.name),
+            };
+            connectMogo('type', 'find', typeName).then(x => {
                 x.db.close();
                 res.writeHead(200, { 'Content-Type': 'text/plain;charset=utf-8' });
                 res.end(JSON.stringify({ status: 1, msg: "查询成功！", data: x.arr }));
@@ -83,7 +85,7 @@ exports.route = (req, res, userInfo) => {
             break;
         case '/api/list/add':
             // 添加列表数据
-            connectMogo('list', 'insertOne', data).then(z => {
+            connectMogo('list', 'insertOne', { ...data, addTime: new Date() }).then(z => {
                 z.db.close();
                 res.writeHead(200, { 'Content-Type': 'text/plain;charset=utf-8' });
                 res.end(JSON.stringify({ status: 1, msg: "添加成功！", data: data }));
@@ -92,8 +94,13 @@ exports.route = (req, res, userInfo) => {
             })
             break;
         case '/api/list/list':
+            let where = {
+                year: data.year || { $ne: null },
+                month: data.month || { $ne: null }
+            };
+
             // 返回所有的列表
-            connectMogo('list', 'find').then(x => {
+            connectMogo('list', 'find', where).then(x => {
                 x.db.close();
                 res.writeHead(200, { 'Content-Type': 'text/plain;charset=utf-8' });
                 res.end(JSON.stringify({ status: 1, msg: "查询成功！", data: x.arr }));
