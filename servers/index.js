@@ -5,6 +5,7 @@ const url = require('url');
 const moggoUrl = 'mongodb://localhost:27017/haiying';
 const https = require('https');
 const querystring = require('querystring');
+var ObjectID = require('mongodb').ObjectID;
 
 http.createServer((req, res) => {
     const path = url.parse(req.url).pathname;
@@ -43,7 +44,8 @@ http.createServer((req, res) => {
                         if (x.arr && x.arr.openid === wxData.openid) {
                             x.db.close();
                             console.log(x.arr.nickName + "---登录");
-                            connectMogo('user', 'updateOne', { _id: ObjectID(x.arr._id) }, { $set: { ...x.arr, session_key: ObjectID(wxData.session_key) } }).then(x => {
+                            connectMogo('user', 'updateOne', { _id: ObjectID(x.arr._id) }, { $set: { ...x.arr, session_key: wxData.session_key } }).then(x => {
+                                console.log('修改session_key成功！');
                                 x.db.close();
                             }).catch(err => {
                                 console.log(err);
