@@ -90,6 +90,8 @@ http.createServer((req, res) => {
             var dbase = db.db("haiying");
             dbase.collection('user').findOne({ session_key: data.session_key }, (err, arr) => {
                 if (err || !arr) {
+                    console.log('错误', err);
+                    console.log('错误', arr);
                     res.writeHead(200, { 'Content-Type': 'text/plain;charset=utf-8' });
                     res.end(JSON.stringify({ status: 0, msg: "非法用户，请登录！", data: [] }));
                     return
