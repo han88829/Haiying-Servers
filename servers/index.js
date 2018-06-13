@@ -42,6 +42,7 @@ http.createServer((req, res) => {
                     connectMogo('user', 'findOne', { openid: wxData.openid }).then(x => {
                         if (x.arr && x.arr.openid === wxData.openid) {
                             x.db.close();
+                            console.log(x.arr.nickName + "---登录")
                             res.writeHead(200, { 'Content-Type': 'text/plain;charset=utf-8' });
                             res.end(JSON.stringify({
                                 status: 1, msg: "登录成功", data: {
