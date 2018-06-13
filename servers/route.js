@@ -5,7 +5,7 @@ const moggoUrl = 'mongodb://localhost:27017/haiying';
 const http = require('https');
 var ObjectID = require('mongodb').ObjectID;
 
-exports.route = (req, res) => {
+exports.route = (req, res, userInfo) => {
     const path = url.parse(req.url).pathname;
 
     let data = '';
@@ -123,59 +123,6 @@ exports.route = (req, res) => {
             }).catch(err => {
                 console.log(err);
             })
-            break;
-        case '/api/login':
-            // 登录
-            const wxLogin = `/sns/jscode2session?appid=wx3efb2a6b9e27f092&secret=65ffe10b9e3db2954f3602f056bfcc97&js_code=${data.code}&grant_type=authorization_code`;
-
-            const options = {
-                hostname: 'api.weixin.qq.com',
-                path: wxLogin,
-                method: 'GET'
-            };
-
-            const request = http.request(options, (httpReq) => {
-                let wxData = '';
-                httpReq.on('data', (d) => {
-                    wxData += d;
-                });
-                httpReq.on('end', () => {
-                    wxData = JSON.parse(wxData);
-                    if (wxData.openid) {
-                        connectMogo('user', 'findOne', { openid: wxData.openid }).then(x => {
-                            if (x.arr && x.arr.openid === wxData.openid) {
-                                x.db.close();
-                                res.writeHead(200, { 'Content-Type': 'text/plain;charset=utf-8' });
-                                res.end(JSON.stringify({
-                                    status: 0, msg: "登录成功", data: {
-                                        ...data,
-                                        ...wxData
-                                    }
-                                }));
-                                return
-                            }
-                            const user = {
-                                ...data,
-                                ...wxData
-                            };
-                            connectMogo('user', 'insertOne', user).then(z => {
-                                z.db.close();
-                                res.writeHead(200, { 'Content-Type': 'text/plain;charset=utf-8' });
-                                res.end(JSON.stringify({ status: 1, msg: "添加成功！", data: user }));
-                            }).catch(err => {
-                                console.log(err)
-                            })
-                        }).catch(err => {
-                            console.log(err);
-                        })
-                    }
-                })
-            });
-
-            request.on('error', (e) => {
-                console.error(e);
-            });
-            request.end();
             break;
         case '/api/user/list':
             // 返回所有的列表
