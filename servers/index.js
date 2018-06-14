@@ -39,7 +39,7 @@ http.createServer((req, res) => {
             });
             httpReq.on('end', () => {
                 wxData = JSON.parse(wxData);
-                if (true || wxData.openid) {
+                if (wxData.openid) {
                     connectMogo('user', 'findOne', { openid: wxData.openid }).then(x => {
                         if (x.arr && x.arr.openid === wxData.openid) {
                             x.db.close();
@@ -98,7 +98,6 @@ http.createServer((req, res) => {
             };
             var dbase = db.db("haiying");
             dbase.collection('user').findOne({ session_key: data.session_key }, (err, arr) => {
-                console.log(data);
                 if (err || !arr) {
                     console.log('错误', err);
                     res.writeHead(200, { 'Content-Type': 'text/plain;charset=utf-8' });
