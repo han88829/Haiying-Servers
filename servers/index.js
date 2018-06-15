@@ -6,6 +6,7 @@ const moggoUrl = 'mongodb://localhost:27017/haiying';
 const https = require('https');
 const querystring = require('querystring');
 var ObjectID = require('mongodb').ObjectID;
+const fs = require('fs');
 
 http.createServer((req, res) => {
     const path = url.parse(req.url).pathname;
@@ -15,7 +16,7 @@ http.createServer((req, res) => {
     // 接收数据
     if (req.method === 'GET') {
         data = querystring.parse(url.parse(req.url).query);
-    } else {
+    } else if (req.method === 'POST' && !req.headers['content-type'].includes('form')) {
         req.on('data', function (chunk) {
             data += chunk;
         });
@@ -85,6 +86,11 @@ http.createServer((req, res) => {
             console.error(e);
         });
         request.end();
+    } else if (path.startsWith('/servers')) {
+        fs.readFile('.' + path, function (err, data) {
+            if (err) throw err;
+            res.end(data);
+        })
     } else if (!data.session_key) {
         res.writeHead(200, { 'Content-Type': 'text/plain;charset=utf-8' });
         res.end(JSON.stringify({ status: 0, msg: "请登录！", data: [] }));

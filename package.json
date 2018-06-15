@@ -1,6 +1,8 @@
 {
   "dependencies": {
     "altogether": "^1.0.0",
-    "mongodb": "^3.0.10"
+    "formidable": "^1.2.1",
+    "mongodb": "^3.0.10",
+    "node-uuid": "^1.4.8"
   }
 }

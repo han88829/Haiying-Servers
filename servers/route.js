@@ -4,16 +4,17 @@ const querystring = require('querystring');
 const moggoUrl = 'mongodb://localhost:27017/haiying';
 const http = require('https');
 var ObjectID = require('mongodb').ObjectID;
+const fs = require('fs');
+const upload = require('./upload');
 
 exports.route = (req, res, userInfo) => {
     const path = url.parse(req.url).pathname;
 
     let data = '';
 
-    // 接收数据
     if (req.method === 'GET') {
         data = querystring.parse(url.parse(req.url).query);
-    } else {
+    } else if (req.method === 'POST' && !req.headers['content-type'].includes('form')) {
         req.on('data', function (chunk) {
             data += chunk;
         });
@@ -147,6 +148,25 @@ exports.route = (req, res, userInfo) => {
                 res.end(JSON.stringify({ status: 0, msg: "你不是管理员", data: [] }))
             }
 
+            break;
+        case '/api/upload':
+            upload(req, function (err, files) {
+                console.log(files.file);
+                const endData = {
+                    status: 1,
+                    msg: "上传成功",
+                    data: `http://haiying.h88829.top` + files.file.path.substr(1)
+                }
+                res.writeHead(200, { 'Content-Type': 'text/json;charset=utf-8' });
+                res.end(JSON.stringify(endData));
+            })
+            break;
+        case '/upload.html':
+            fs.readFile('./servers/views/upload.html', 'utf-8', function (err, data) {
+                if (err) console.log('读取文件错误', err);
+                res.writeHead(200, { 'Content-Type': 'text/html;charset=utf-8' });
+                res.end(data);
+            })
             break;
         default:
             // console.log(111);
