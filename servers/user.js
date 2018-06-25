@@ -1,40 +1,19 @@
+const router = require('koa-router')();
+const connectMogo = require('./utils/connectMogo');
 
-// 封装路由
+router.get('/api/user/list', (ctx, next) => {
+    const id = ctx.query.id;
 
-const url = require('url');
-const http = require('http');
-
-let data = {
-
-}
-
-let app = (req, res) => {
-    const path = url.parse(req.url).pathname;
-
-    if (data[path]) {
-        data[path](req, res);
-    } else {
-        res.writeHead(200, { 'Content-Type': 'text/plain;charset=utf-8' });
-        res.end('未匹配到路由')
+    if (id != 326688829) {
+        ctx.body = { status: 0, msg: "你不是管理员", data: null };
+        return
     }
-}
 
-app.get = (path, callback) => {
-    data[path] = callback;
-}
+    connectMogo.connectMogo('user', 'find').then(x => {
+        x.db.close();
+        ctx.body = { status: 1, msg: "查询成功！", data: x.arr };
+    }).catch(err => {
+        console.log(err);
+    })
 
-
-http.createServer(app).listen(3003);
-
-
-app.get('/', function (req, res) {
-    res.end('/');
-})
-
-app.get('/login', function (req, res) {
-    res.end('login');
-})
-
-app.get('/home', function (req, res) {
-    res.end('home');
 })

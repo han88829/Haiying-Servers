@@ -2,6 +2,8 @@
   "dependencies": {
     "altogether": "^1.0.0",
     "formidable": "^1.2.1",
+    "koa": "^2.5.1",
+    "koa-router": "^7.4.0",
     "mongodb": "^3.0.10",
     "node-uuid": "^1.4.8"
   }
