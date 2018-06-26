@@ -44,7 +44,8 @@ http.createServer((req, res) => {
                     connectMogo('user', 'findOne', { openid: wxData.openid }).then(x => {
                         if (x.arr && x.arr.openid === wxData.openid) {
                             x.db.close();
-                            console.log(x.arr.nickName + "---登录", new Date());
+                            console.log(x.arr.nickName + "---登录");
+                            console.log(new Date());
                             connectMogo('user', 'updateOne', { _id: ObjectID(x.arr._id) }, { $set: { ...x.arr, session_key: wxData.session_key } }).then(x => {
                                 // console.log('修改session_key成功！');
                                 x.db.close();
@@ -66,6 +67,7 @@ http.createServer((req, res) => {
                             addTime: new Date(),
                         };
                         connectMogo('user', 'insertOne', user).then(z => {
+                            console.log(user.nickName, '注册成功');
                             z.db.close();
                             res.writeHead(200, { 'Content-Type': 'text/plain;charset=utf-8' });
                             res.end(JSON.stringify({ status: 1, msg: "添加成功！", data: user }));
