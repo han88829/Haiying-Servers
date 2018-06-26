@@ -37,6 +37,7 @@ exports.route = (req, res, userInfo) => {
                     return
                 }
                 connectMogo('type', 'insertOne', { ...data, addTime: new Date() }).then(z => {
+                    console.log(`添加类型${data.name}成功！`, new Date());
                     x.db.close();
                     res.writeHead(200, { 'Content-Type': 'text/plain;charset=utf-8' });
                     res.end(JSON.stringify({ status: 1, msg: "添加成功！", data: data }));
@@ -87,6 +88,7 @@ exports.route = (req, res, userInfo) => {
         case '/api/list/add':
             // 添加列表数据
             connectMogo('list', 'insertOne', { ...data, addTime: new Date() }).then(z => {
+                console.log(`添加列表成功！`, new Date());
                 z.db.close();
                 res.writeHead(200, { 'Content-Type': 'text/plain;charset=utf-8' });
                 res.end(JSON.stringify({ status: 1, msg: "添加成功！", data: data }));
